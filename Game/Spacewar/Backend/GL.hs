@@ -17,7 +17,7 @@ runBackend players = do
     (_progName, _args) <- getArgsAndInitialize
     initialWindowSize $= (Size 400 400)
     initialDisplayMode $= [WithSamplesPerPixel 32]
-    _window <- createWindow "Hacktroids"
+    _window <- createWindow "spacewΛr"
 
     state <- newIORef $ startState players
     controls <- newIORef $ replicate (length players) 0
