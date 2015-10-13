@@ -1,4 +1,4 @@
-spacewΛr is a Haskell implementation of [the classic video game](https://en.wikipedia.org/wiki/Spacewar_(video_game\)).
+spacewΛr is a Haskell implementation of [the classic video game](https://en.wikipedia.org/wiki/Spacewar_(video_game)).
 It is backend-agnostic, adaptible to any device that can draw a set of vectors.
 
 More details are available on the [project page](http://mattkeeter.com/projects/spacewar).
