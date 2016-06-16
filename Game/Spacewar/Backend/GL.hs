@@ -15,7 +15,7 @@ import Game.Spacewar.State
 import Game.Spacewar.Controls
 import Game.Spacewar.Physics
 
-import Game.Spacewar.Backend.Common (keyboard)
+import Game.Spacewar.Backend.Common (keyboard, joystickAxis, joystickButton)
 
 runBackend :: [KeyMap] -> IO ()
 runBackend players = do
@@ -28,12 +28,17 @@ runBackend players = do
     state <- newIORef $ startState players
     controls <- newIORef $ replicate (length players) 0
 
+    joysticks <- availableJoysticks
+    mapM_ openJoystick joysticks
     appLoop renderer players controls state
 
 processEvent :: [KeyMap] -> IORef [Control] -> Event -> IO ()
 processEvent players controls event = do
+    print (show event)
     case eventPayload event of
         KeyboardEvent kb -> keyboard players controls kb
+        JoyAxisEvent js -> joystickAxis controls js
+        JoyButtonEvent js -> joystickButton controls js
         _ -> return ()
 
 appLoop :: Renderer -> [KeyMap] -> IORef [Control] -> IORef State -> IO ()
@@ -48,6 +53,8 @@ appLoop renderer players controls state = do
     clear renderer
     display renderer state
     present renderer
+
+    delay 20
 
     appLoop renderer players controls state
 
