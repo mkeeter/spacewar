@@ -1,10 +1,15 @@
 module Game.Spacewar.Backend.GL where
 
 import Data.IORef
+import Data.Vector.Storable (Vector, fromList)
 
 import Linear.V2
+import Linear.V4
+import Linear.Affine (Point(..))
+import Foreign.C.Types (CInt)
+import Data.Text (pack)
 
-import Graphics.UI.GLUT
+import SDL
 
 import Game.Spacewar.State
 import Game.Spacewar.Controls
@@ -14,20 +19,49 @@ import Game.Spacewar.Backend.Common (keyboard)
 
 runBackend :: [KeyMap] -> IO ()
 runBackend players = do
-    (_progName, _args) <- getArgsAndInitialize
-    initialWindowSize $= (Size 400 400)
-    initialDisplayMode $= [WithSamplesPerPixel 32]
-    _window <- createWindow "spacewΛr"
+    initializeAll
+    window <- createWindow (pack "Spacewar") defaultWindow
+    renderer <- createRenderer window (-1) defaultRenderer
 
     state <- newIORef $ startState players
     controls <- newIORef $ replicate (length players) 0
 
-    lineSmooth $= Enabled
-    displayCallback $= display state
-    idleCallback $= Just (idle state controls)
-    keyboardMouseCallback $= Just (keyboard players controls)
-    mainLoop
+    appLoop renderer players controls state
 
+processEvent :: [KeyMap] -> IORef [Control] -> Event -> IO ()
+processEvent players controls event = do
+    case eventPayload event of
+        KeyboardEvent kb -> keyboard players controls kb
+        _ -> return ()
+
+appLoop :: Renderer -> [KeyMap] -> IORef [Control] -> IORef State -> IO ()
+appLoop renderer players controls state = do
+    -- Handle all events (which update control bitfields and quits as needed)
+    mapEvents (processEvent players controls)
+
+    -- Get the next state from the current state
+    controls' <- readIORef controls
+    modifyIORef state $ nextState controls'
+
+    clear renderer
+    display renderer state
+    present renderer
+
+    appLoop renderer players controls state
+
+display :: Renderer -> IORef State -> IO ()
+display renderer s' = do
+    s <- readIORef s'
+    rendererDrawColor renderer $= V4 0 0 0 0
+    clear renderer
+    mapM_ (\pts -> drawLines renderer (convertLine pts)) $ draw s
+
+convertLine :: [V2f] -> Vector (Point V2 CInt)
+convertLine pts =
+    fromList [P $ V2 (round $ (x + 1) * 100)
+                     (round $ (y + 1) * 100) | V2 x y <- pts]
+
+{-
 drawLine :: [V2f] -> V2f -> IO ()
 drawLine line (V2 dx dy) =
     renderPrimitive LineStrip $
@@ -47,9 +81,4 @@ display s' = do
     clear [ColorBuffer]
     mapM_ drawLineWrapped $ draw s
     flush
-
-idle :: IORef State -> IORef [Control] -> IdleCallback
-idle s' c' = do
-    c <- readIORef c'
-    modifyIORef s' (nextState c)
-    postRedisplay Nothing
+-}

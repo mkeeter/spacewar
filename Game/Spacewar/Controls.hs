@@ -1,18 +1,17 @@
 module Game.Spacewar.Controls where
 
 import Data.Word
-import Graphics.UI.GLUT
+import SDL
 
 data Command = TurnLeft | TurnRight | Accel | Shoot deriving (Show, Enum)
-type KeyMap = [Key]
+type KeyMap = [Keycode]
 type Control = Word8
 
 player1 :: KeyMap
-player1 = [SpecialKey KeyLeft, SpecialKey KeyRight,
-           SpecialKey KeyUp, Char ' ']
+player1 = [KeycodeLeft, KeycodeRight, KeycodeUp, KeycodeSpace]
 
 player2 :: KeyMap
-player2 = [Char 'a', Char 'd', Char 'w', Char 's']
+player2 = [KeycodeA, KeycodeD, KeycodeW, KeycodeS]
 
 playernum :: KeyMap
-playernum = [Char '4', Char '6', Char '8', Char '0']
+playernum = [Keycode4, Keycode6, Keycode8, Keycode0]
