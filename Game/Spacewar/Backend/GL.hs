@@ -20,7 +20,9 @@ import Game.Spacewar.Backend.Common (keyboard)
 runBackend :: [KeyMap] -> IO ()
 runBackend players = do
     initializeAll
-    window <- createWindow (pack "Spacewar") defaultWindow
+    window <- createWindow (pack "Spacewar")
+                           (defaultWindow {windowInitialSize = V2 400 400,
+                                           windowResizable = False})
     renderer <- createRenderer window (-1) defaultRenderer
 
     state <- newIORef $ startState players
@@ -58,8 +60,8 @@ display renderer s' = do
 
 convertLine :: [V2f] -> Vector (Point V2 CInt)
 convertLine pts =
-    fromList [P $ V2 (round $ (x + 1) * 100)
-                     (round $ (y + 1) * 100) | V2 x y <- pts]
+    fromList [P $ V2 (round $ (x + 1) * 200)
+                     (round $ (y + 1) * 200) | V2 x y <- pts]
 
 {-
 drawLine :: [V2f] -> V2f -> IO ()

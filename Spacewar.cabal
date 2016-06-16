@@ -16,7 +16,13 @@ cabal-version:       >=1.10
 
 executable spacewar
   main-is: Main.hs
-  -- other-modules:
+  other-modules:
+    Game.Spacewar.Actors
+    Game.Spacewar.Backend.Common
+    Game.Spacewar.Backend.GL
+    Game.Spacewar.Controls
+    Game.Spacewar.Physics
+    Game.Spacewar.State
   -- other-extensions:
   build-depends:
     base == 4.8.*,
